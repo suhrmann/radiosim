@@ -1,13 +1,15 @@
 // /composables/useSound.ts
 import {useSoundStore} from '@/stores/useSoundStore';
 import {storeToRefs} from 'pinia';
+import {useDeviceStore} from "~/stores/useDeviceStore";
 
 export function useSound() {
+    const device = useDeviceStore();
     const store = useSoundStore();
     const {isSoundPlaying, currentAudio, lockTimeout} = storeToRefs(store);
 
     function playSound(soundPath: string) {
-        if (!isSoundPlaying.value) {
+        if (!device.isPoweredOff && !isSoundPlaying.value) {
             // Falls ein Sound bereits läuft, unterbreche ihn
             if (currentAudio.value) {
                 currentAudio.value.pause();

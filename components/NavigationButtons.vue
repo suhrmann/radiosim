@@ -5,6 +5,45 @@ import {useNavigationStore} from '@/stores/useNavigationStore';
 const navStore = useNavigationStore();
 const store = useDeviceStore();
 
+function handleGreenButtonClick() {
+  switch (store.currentAction) {
+    case '':
+      break;
+    default:
+      break;
+  }
+}
+
+function handleRedButtonClick() {
+  switch (store.currentAction) {
+    case '':
+      break;
+    default:
+      break;
+  }
+}
+
+function handleLongRedButtonClick() {
+  switch (store.currentAction) {
+    case '':
+      // Boot logic
+      if (store.isPoweredOff) {
+        store.isBooting = true;
+        break;
+      }
+
+      // Power off logic
+      if (!store.isPoweredOff) {
+        store.isPoweredOff = true;
+        break;
+      }
+
+      break;
+    default:
+      break;
+  }
+}
+
 function handleNavigationButtonClick(direction: string) {
   // Aktion basierend auf dem Zustand des Stores ausführen
   switch (store.currentAction) {
@@ -41,7 +80,8 @@ function handleGroupSelection(direction: string) {
 <template>
   <div class="w-full flex justify-evenly items-center">
     <!-- Green Call Button -->
-    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg mr-2">
+    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg mr-2"
+            @click="handleGreenButtonClick()">
       <Icon class="text-green-600" name="material-symbols:call"/>
     </button>
 
@@ -58,7 +98,8 @@ function handleGroupSelection(direction: string) {
     </div>
 
     <!-- Red Cancel Button -->
-    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg ml-2">
+    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg ml-2"
+            v-longpress="handleLongRedButtonClick" @click="handleRedButtonClick()">
       <Icon class="text-red-600" name="material-symbols:phone-disabled-rounded"/>
     </button>
   </div>

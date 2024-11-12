@@ -5,6 +5,10 @@ import {Mode} from "~/types/interfaces";
 
 export const useDeviceStore = defineStore('device', {
     state: () => ({
+        isPoweredOff: true,
+        isBooting: false,
+        led1Color: '',
+        led2Color: '',
         status: 'DMO Modus',
         time: dayjs().format('HH:mm'),
         date: dayjs().format('DD.MM.YYYY'),

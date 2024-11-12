@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useDeviceStore} from '@/stores/useDeviceStore';
 import CheckmarkModal from "~/components/CheckmarkModal.vue";
+import BootScreen from "~/components/BootScreen.vue";
 
 const store = useDeviceStore();
 </script>
@@ -9,7 +10,7 @@ const store = useDeviceStore();
   <div class="h-full w-full bg-black rounded-md p-2 flex flex-col text-xs">
     <div class="font-bold text-center mb-1">LK24</div>
 
-    <div>
+    <div v-if="!store.isPoweredOff" class="flex flex-col min-h-80 max-h-80">
       <!-- Context Hints -->
       <div class="flex justify-between items-center h-4 py-3 space-x-1 bg-gray-800 text-lg">
         <div class="space-x-1">
@@ -25,7 +26,7 @@ const store = useDeviceStore();
       </div>
 
       <!-- Main Screen -->
-      <div class="relative flex flex-col flex-1 h-full min-h-72 max-h-72 bg-gray-200">
+      <div class="relative flex flex-col flex-1 bg-gray-200">
 
         <!-- Overlay Modal -->
         <div class="absolute inset-8 flex items-center justify-center z-20" v-if="store.isModalOpen">
@@ -74,10 +75,9 @@ const store = useDeviceStore();
         <div v-else></div>
       </div>
     </div>
+    <div v-if="store.isPoweredOff" class="flex min-h-80 max-h-80 bg-gray-900">
+      <BootScreen v-if="store.isBooting"/>
+    </div>
 
   </div>
 </template>
-
-<style scoped>
-/* Hier kannst du spezifische Styles hinzufügen, falls erforderlich */
-</style>
