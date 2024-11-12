@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  funk:
+    image: funk:latest
+    build:
+      context: .
+    container_name: funk
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.funk.entrypoints=http"
+      - "traefik.http.routers.funk.rule=Host(`funk.nur-kurz.de`)"
+      - "traefik.http.middlewares.funk-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.funk.middlewares=funk-https-redirect"
+      - "traefik.http.routers.funk-secure.entrypoints=https"
+      - "traefik.http.routers.funk-secure.rule=Host(`funk.nur-kurz.de`)"
+      - "traefik.http.routers.funk-secure.tls=true"
+      - "traefik.http.routers.funk-secure.tls.certresolver=http"
+      - "traefik.http.routers.funk-secure.service=funk"
+      - "traefik.http.services.funk.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
