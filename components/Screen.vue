@@ -6,7 +6,7 @@ const store = useDeviceStore();
 </script>
 
 <template>
-  <div class="h-full w-full bg-black rounded-md p-2 flex flex-col text-xs">
+  <div class="h-full w-full bg-black rounded-md p-2 flex flex-col text-xs no-select">
     <div class="font-bold text-center mb-1">LK24</div>
 
     <div>
@@ -80,4 +80,7 @@ const store = useDeviceStore();
 
 <style scoped>
 /* Hier kannst du spezifische Styles hinzufügen, falls erforderlich */
+.no-select {
+  user-select: none;  /* unsupported on iOS, no workaround */
+}
 </style>
