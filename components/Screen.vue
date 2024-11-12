@@ -7,7 +7,7 @@ const store = useDeviceStore();
 </script>
 
 <template>
-  <div class="h-full w-full bg-black rounded-md p-2 flex flex-col text-xs">
+  <div class="h-full w-full bg-black rounded-md p-2 flex flex-col text-xs no-select">
     <div class="font-bold text-center mb-1">LK24</div>
 
     <div v-if="!store.isPoweredOff" class="flex flex-col min-h-80 max-h-80">
@@ -81,3 +81,10 @@ const store = useDeviceStore();
 
   </div>
 </template>
+
+<style scoped>
+/* Hier kannst du spezifische Styles hinzufügen, falls erforderlich */
+.no-select {
+  user-select: none;  /* unsupported on iOS, no workaround */
+}
+</style>
