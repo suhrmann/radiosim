@@ -106,11 +106,11 @@ function handleGroupSelection(direction: string) {
     <button
         class="w-6 h-20 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 text-white rounded-md flex items-center justify-center text-lg ml-2"
         v-use-longpress @longpress="handleLongRedButtonClick" @click="handleRedButtonClick()">
-      <div class="flex flex-col h-full py-1 justify-between items-center">
+      <span class="flex flex-col h-full py-1 justify-between items-center">
         <Icon size="0.7rem" class="text-white" name="material-symbols:other-houses"/>
         <Icon class="text-red-600" name="material-symbols:phone-disabled-rounded"/>
         <Icon size="0.7rem" class="text-white" name="material-symbols:power-settings-new"/>
-      </div>
+      </span>
     </button>
   </div>
 </template>
