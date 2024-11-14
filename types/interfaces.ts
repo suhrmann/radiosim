@@ -1,13 +1,18 @@
+export interface Root {
+    folders: Folder[];
+    description?: string; // Optional: Beschreibung der Konfiguration
+}
+
 export interface Folder {
+    id: number;
     name: string;
     groups?: Group[]; // Optional: Kann Gruppen enthalten
     subFolders?: Folder[]; // Optional: Kann Unterordner enthalten
 }
 
 export interface Group {
-    name: string;
     number: number;
-    folder: string;
+    name: string;
     mode: Mode;
 }
 

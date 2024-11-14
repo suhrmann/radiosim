@@ -1,7 +1,9 @@
-import {defineStore} from 'pinia';
+// /stores/useDeviceStore.ts
+
 import dayjs from 'dayjs';
-import type {Contexts, Group} from "~/types/interfaces";
+import type {Contexts, Folder, Group} from "~/types/interfaces";
 import {Mode} from "~/types/interfaces";
+import {useSound} from "~/composables/useSound";
 
 export const useDeviceStore = defineStore('device', {
     state: () => ({
@@ -12,12 +14,9 @@ export const useDeviceStore = defineStore('device', {
         status: 'DMO Modus',
         time: dayjs().format('HH:mm'),
         date: dayjs().format('DD.MM.YYYY'),
-        group: {
-            name: '310_F*',
-            number: 310,
-            folder: 'DMO FW',
-            mode: Mode.DMO,
-        } as Group,
+        dateTimeInterval: null as NodeJS.Timeout | null,
+        group: null as Group | null,
+        folder: null as Folder | null,
         isModalOpen: false,  // Neuer Zustand für das Modal
         activeModal: '',
         currentAction: '', // Neue Eigenschaft für die aktuelle Aktion
@@ -65,11 +64,14 @@ export const useDeviceStore = defineStore('device', {
         toggleLock() {
             this.locked = !this.locked;
         },
-        confirmGroupChange(selectedGroup: Group) {
+        confirmGroupChange(selectedGroup: Group | null, selectedFolder: Folder | null) {
+            const {playSound} = useSound();
+
             if (!selectedGroup || !selectedGroup.name) {
                 console.warn('No group was selected');
 
                 this.showFail = true;
+                playSound('/sounds/fail.wav');
                 setTimeout(() => {
                     this.showFail = false;
                 }, 2000);
@@ -77,29 +79,42 @@ export const useDeviceStore = defineStore('device', {
                 return;
             }
 
-            console.log('confirmGroupChange');
             if (
-                (this.group.mode === Mode.DMO && selectedGroup.mode === Mode.TMO)
-                || (this.group.mode === Mode.TMO && selectedGroup.mode === Mode.DMO)
+                this.group === null ||
+                (this.group?.mode === Mode.DMO && selectedGroup.mode === Mode.TMO) ||
+                (this.group?.mode === Mode.TMO && selectedGroup.mode === Mode.DMO)
             ) {
                 this.showCheckmark = true;
+                playSound('/sounds/mode_change.wav');
                 setTimeout(() => {
                     this.showCheckmark = false;
+                    playSound('/sounds/mode_change.wav');
                 }, 2000);
             }
 
             this.group = selectedGroup;
+            this.folder = selectedFolder;
 
             if (selectedGroup.mode === Mode.TMO) {
                 this.setStatus('__Status 2__');
+            } else {
+                this.setStatus('DMO Modus');
             }
         },
+        powerOn() {
+            this.isPoweredOff = false;
+            this.isBooting = true;
+            this.dateTimeInterval = setInterval(() => {
+                this.updateDateTime();
+            }, 60000); // Alle 60 Sekunden aktualisieren
+        },
+        powerOff() {
+            this.isPoweredOff = true;
+        }
     },
-    // Nutze `setup()` um das automatische Update zu starten
-    setup() {
-        const store = useDeviceStore();
-        setInterval(() => {
-            store.updateDateTime();
-        }, 60000); // Alle 60 Sekunden aktualisieren
-    },
+    getters: {
+        isGroupSelected(): boolean {
+            return this.group !== null && this.folder !== null;
+        }
+    }
 });

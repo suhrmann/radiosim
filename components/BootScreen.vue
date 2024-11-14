@@ -12,9 +12,7 @@ onMounted(() => {
 
   boottimer = window.setTimeout(() => {
     store.led1Color = '';
-    store.isPoweredOff = false;
     store.isBooting = false;
-
     playSound('/sounds/mode_change.wav')
   }, 5000);
 });

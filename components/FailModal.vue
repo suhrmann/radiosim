@@ -1,13 +1,4 @@
 <script setup lang="ts">
-import {useSound} from '@/composables/useSound';
-
-const {playSound} = useSound();
-
-// Bei Mount wird die aktuelle Aktion gesetzt
-onMounted(() => {
-  console.log('Mount FailModal');
-  playSound('/sounds/fail.wav');
-});
 </script>
 
 <template>

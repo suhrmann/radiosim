@@ -1,18 +1,4 @@
 <script setup lang="ts">
-import {useSound} from '@/composables/useSound';
-
-const {playSound} = useSound();
-
-// Bei Mount wird die aktuelle Aktion gesetzt
-onMounted(() => {
-  console.log('Mount CheckmarkModal');
-  playSound('/sounds/mode_change.wav');
-});
-
-onBeforeUnmount(() => {
-  console.log('BeforeUnmount CheckmarkModal');
-  playSound('/sounds/mode_change.wav');
-});
 </script>
 
 <template>

@@ -5,7 +5,6 @@ import {useAppSettingsStore} from "~/stores/useAppSettingsStore";
 const settings = useAppSettingsStore();
 
 const {playSound} = useSound();
-
 onMounted(() => {
   // Event Listener hinzufügen
   const handleButtonClick = (event: Event) => {

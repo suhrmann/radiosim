@@ -9,7 +9,7 @@ export function useSound() {
     const {isSoundPlaying, currentAudio, lockTimeout} = storeToRefs(store);
 
     function playSound(soundPath: string) {
-        if (!device.isPoweredOff && !isSoundPlaying.value) {
+        if (!device.isPoweredOff && !device.isBooting && !isSoundPlaying.value) {
             // Falls ein Sound bereits läuft, unterbreche ihn
             if (currentAudio.value) {
                 currentAudio.value.pause();

@@ -1,46 +1,58 @@
 // /stores/useNavigationStore.ts
-import {defineStore} from 'pinia';
-import type {Folder, Group} from "~/types/interfaces";
+import type {Folder, Group, Root} from "~/types/interfaces";
 import {folderData} from '@/data/folderData';
 
 export const useNavigationStore = defineStore('navigation', {
     state: () => ({
         currentLevel: 1, // Gibt an, auf welcher Ebene wir uns befinden (0 = Root, 1 = erste Ebene, usw.)
-        currentFolder: folderData as Folder,  // Der aktuelle Ordner, wenn wir tiefer als die Root-Ebene sind
-        currentGroup: undefined as Group | undefined, // Die aktuelle Gruppe, wenn eine ausgewählt ist
+        currentFolder: null as Folder | null,  // Der aktuelle Ordner, wenn wir tiefer als die Root-Ebene sind
+        currentGroup: null as Group | null, // Die aktuelle Gruppe, wenn eine ausgewählt ist
         path: [] as string[], // Der Navigationspfad
         numberSearch: '',
     }),
 
     actions: {
-        initialize(group: Group) {
-            const foundFolder = this.find(group.folder, group.name);
-            if (foundFolder) {
-                const path = this.getFolderPath(foundFolder.name);
-                path.pop();
+        initialize(selectedGroup?: Group) {
+            if (selectedGroup) {
+                const {group, folder} = this.findGroupByNumber(selectedGroup.number) || {group: null, folder: null};
 
-                this.path = path;
-                this.currentFolder = foundFolder;
-                this.currentLevel = this.path.length + 1;
-                this.currentGroup = group;
+                if (folder) {
+                    const path = this.getFolderPath(folder.name);
+                    this.path = path;
+                    this.currentFolder = folder;
+                    this.currentLevel = this.path.length + 1;
+                    this.currentGroup = group;
+                } else {
+                    console.warn("Ordner oder Gruppe nicht gefunden.");
+                }
             } else {
-                console.warn("Ordner oder Gruppe nicht gefunden.");
+                this.currentLevel = 1;
+                this.currentFolder = folderData.folders[0];
+                this.currentGroup = null;
+                this.path = [];
             }
         },
 
         navigateUp() {
             if (this.currentLevel > 1) {
-                console.log(this.path)
                 this.currentLevel--;
-                this.path.pop();
 
-                const folderByPath = this.getFolderByPath(this.path);
-                this.currentFolder = folderByPath?.subFolders[0];
-                if (this.currentFolder.groups?.length > 0) {
-                    this.currentGroup = this.currentFolder.groups[0];
+                const parentFolder = this.path[this.path.length - 1]; // letzten Parent-Ordner merken
+
+                if (this.path.length == 0) {
+                    this.path.pop();
+                    this.currentFolder = folderData.folders.find(f => f.name === parentFolder) || null;
+                    this.currentGroup = null;
                 } else {
-                    this.currentGroup = undefined;
+                    this.currentFolder = this.getFolderByPath(this.path);
+                    this.path.pop();
+                    if (this.currentFolder.groups?.length > 0) {
+                        this.currentGroup = this.currentFolder.groups[0];
+                    } else {
+                        this.currentGroup = null;
+                    }
                 }
+
             }
         },
 
@@ -53,60 +65,68 @@ export const useNavigationStore = defineStore('navigation', {
                 if (this.currentFolder.groups?.length > 0) {
                     this.currentGroup = this.currentFolder.groups[0];
                 } else {
-                    this.currentGroup = undefined;
+                    this.currentGroup = null;
                 }
             }
         },
 
         navigateVertical(direction: 'left' | 'right') {
-            console.log(this.path)
-            const searchPath = this.path;
-            if (this.currentLevel === 1) {
-                searchPath.pop();
+            console.log("Navigate", direction, "on [", ...this.path, "] (", this.currentLevel, ")");
+
+            const curParentFolder = this.getFolderByPath(this.path);
+
+            if (!curParentFolder) { // wir sind auf Root-Level
+                this.navigateThrough(folderData.folders, direction);
+            } else if (curParentFolder.subFolders) { // wir sind auf einer Unterebene
+                this.navigateThrough(curParentFolder.subFolders, direction);
             }
 
-            const curParentFolder = this.getFolderByPath(searchPath);
-
-            if (curParentFolder?.subFolders && curParentFolder.subFolders.length > 0) {
-                const currentIndex = curParentFolder.subFolders.findIndex(f => f.name === this.currentFolder.name);
-
-                let nextIndex = 0;
-                if (direction === 'right') {
-                    nextIndex = (currentIndex + 1) % curParentFolder.subFolders.length;
-                } else if (direction === 'left') {
-                    nextIndex = (currentIndex - 1 + curParentFolder.subFolders.length) % curParentFolder.subFolders.length;
-                }
-
-                switch (direction) {
-                    case 'left':
-                        this.currentFolder = curParentFolder?.subFolders[nextIndex];
-                        if (this.currentFolder.groups?.length > 0) {
-                            this.currentGroup = this.currentFolder.groups[0];
-                        } else {
-                            this.currentGroup = undefined;
-                        }
-                        break;
-                    case 'right':
-                        this.currentFolder = curParentFolder?.subFolders[nextIndex];
-                        if (this.currentFolder.groups?.length > 0) {
-                            this.currentGroup = this.currentFolder.groups[0];
-                        } else {
-                            this.currentGroup = undefined;
-                        }
-                        break;
-                    default:
-                        console.log("Unkown direction!");
-                        break;
-                }
-            }
 
         },
 
+        navigateThrough(folders: Folder[], direction: 'left' | 'right') {
+            const currentIndex = folders.findIndex(f => f.name === this.currentFolder?.name);
+
+            let nextIndex = 0;
+            if (direction === 'right') {
+                nextIndex = (currentIndex + 1) % folders.length;
+            } else if (direction === 'left') {
+                nextIndex = (currentIndex - 1 + folders.length) % folders.length;
+            }
+
+            switch (direction) {
+                case 'left':
+                    this.currentFolder = folders[nextIndex];
+                    if (this.currentFolder.groups?.length > 0) {
+                        this.currentGroup = this.currentFolder.groups[0];
+                    } else {
+                        this.currentGroup = null;
+                    }
+                    break;
+                case 'right':
+                    this.currentFolder = folders[nextIndex];
+                    if (this.currentFolder.groups?.length > 0) {
+                        this.currentGroup = this.currentFolder.groups[0];
+                    } else {
+                        this.currentGroup = null;
+                    }
+                    break;
+                default:
+                    console.log("Unkown direction!");
+                    break;
+            }
+        },
+
         navigateGroup(direction: 'clockwise' | 'counterclockwise') {
-            const curFolder = this.find(this.currentFolder.name, this.currentGroup.name);
+            if (this.currentFolder === null || this.currentGroup === null) {
+                console.warn('Navigieren nicht möglich, da kein Order oder keine Gruppe gewählt ist.');
+                return;
+            }
+
+            const curFolder = this.findFolder(this.currentFolder.name, this.currentGroup.name);
             console.log(curFolder);
             if (curFolder?.groups && curFolder.groups.length > 0) {
-                const currentIndex = curFolder.groups.findIndex(g => g.name === this.currentGroup.name);
+                const currentIndex = curFolder.groups.findIndex(g => g.name === this.currentGroup?.name);
                 console.log("Current: ", currentIndex);
 
                 let nextIndex = currentIndex;
@@ -119,6 +139,7 @@ export const useNavigationStore = defineStore('navigation', {
 
                 this.currentGroup = curFolder?.groups[nextIndex];
             }
+
         },
 
         navigateByNumber(groupNumber: string) {
@@ -129,15 +150,32 @@ export const useNavigationStore = defineStore('navigation', {
 
             console.log('Searching with group ', this.numberSearch);
             const {group, folder} = this.findGroupByNumber(this.numberSearch) ?? {};
-            console.log('Found ', group, ' and ', folder);
 
             if (group && folder) {
+                console.log('Found ', group.name, ' and ', folder.name);
                 this.currentGroup = group;
                 this.currentFolder = folder;
+                this.path = this.getFolderPath(folder.name);
+                this.currentLevel = this.path.length + 1;
+                this.numberSearch = '';
+                return;
             }
+
+            console.warn('Did not find group for', this.numberSearch);
         },
 
-        find(folder: string, groupName: string) {
+        findFolder(folder: string, groupName: string) {
+            function searchRoot(root: Root): Folder | null {
+                for (const folder of root.folders) {
+                    const found = searchFolders(folder);
+                    if (found) {
+                        return found;
+                    }
+                }
+
+                return null;
+            }
+
             function searchFolders(currentFolder: Folder): Folder | null {
                 // Wenn der aktuelle Ordner dem gesuchten Namen entspricht
                 if (currentFolder.name === folder) {
@@ -166,63 +204,96 @@ export const useNavigationStore = defineStore('navigation', {
                 return null;
             }
 
-            return searchFolders(folderData);
+            return searchRoot(folderData);
         },
 
-        getFolderPath(folder: string): string[] {
-            const path: string[] = [];
+        getFolderPath(search: string): string[] {
+            console.debug('Searching for folder', search);
+            let path: string[] = [];
 
-            function searchPath(currentFolder: Folder, currentPath: string[]): boolean {
-                // Wenn der aktuelle Ordner dem gesuchten Namen entspricht
-                if (currentFolder.name === folder) {
-                    path.push(...currentPath);
+            for (const folder of folderData.folders) {
+                const found = this.searchPath(search, folder, [folder.name]);
+                if (found.length > 0) {
+                    path.push(...found);
+                    return path;
                 }
-
-                // Falls der Ordner Unterordner hat, durchsuche sie rekursiv
-                if (currentFolder.subFolders) {
-                    for (const subFolder of currentFolder.subFolders) {
-                        if (searchPath(subFolder, [...currentPath, subFolder.name])) {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
             }
 
-            searchPath(folderData, []);
+            console.debug('Found folder in', path);
+            return path;
+        },
+
+        searchPath(search: string, currentFolder: Folder, currentPath: string[]): string[] {
+            let path: string[] = [];
+
+            console.debug('Searching for folder', search, 'inside', currentFolder.name);
+
+            // Wenn der aktuelle Ordner dem gesuchten Namen entspricht
+            if (currentFolder.name === search) {
+                path.push(...currentPath);
+                return path;
+            }
+
+            // Falls der Ordner Unterordner hat, durchsuche sie rekursiv
+            if (currentFolder.subFolders) {
+                for (const subFolder of currentFolder.subFolders) {
+                    // wenn der Ordner bereits im currentFolder ist nicht weiter suchen
+                    if (subFolder.name === search) {
+                        return currentPath;
+                    }
+
+                    // ansonsten eine Ebene tiefer suchen
+                    path.push(...this.searchPath(search, subFolder, [...currentPath, subFolder.name]));
+                }
+            }
+
             return path;
         },
 
         getFolderByPath(pathArray: string[]): Folder | null {
-            let currentFolder: Folder | null = folderData;
+            console.log('getFolderByPath...');
+
+            let root: Root = folderData;
+            let currentFolder: Folder | null = null;
 
             for (const folderName of pathArray) {
-                if (currentFolder.subFolders) {
-                    const nextFolder = currentFolder.subFolders.find(
+                if (currentFolder) {
+                    if (currentFolder.subFolders) {
+                        const nextFolder: Folder | null = currentFolder.subFolders.find(
+                            (subFolder) => subFolder.name === folderName
+                        ) || null;
+
+                        if (nextFolder) {
+                            currentFolder = nextFolder;
+                        } else {
+                            console.warn(`Ordner "${folderName}" nicht gefunden.`);
+                            return null;
+                        }
+                    }
+                } else {
+                    const nextFolder: Folder | null = root.folders.find(
                         (subFolder) => subFolder.name === folderName
-                    );
+                    ) || null;
+
                     if (nextFolder) {
                         currentFolder = nextFolder;
                     } else {
                         console.warn(`Ordner "${folderName}" nicht gefunden.`);
-                        return null;
                     }
-                } else {
-                    console.warn("Keine Unterordner vorhanden.");
-                    return null;
                 }
             }
 
             return currentFolder;
         },
 
-        findGroupByNumber(groupNumber: string): { group: Group; folder: Folder } | null {
+        findGroupByNumber(groupNumber: number): { group: Group; folder: Folder } | null {
+            console.log('Searching for', groupNumber);
+
             function searchFolders(currentFolder: Folder): { group: Group; folder: Folder } | null {
                 // Falls der Ordner Gruppen hat, suchen wir nach der passenden Gruppe
                 if (currentFolder.groups) {
                     const foundGroup = currentFolder.groups.find(
-                        (group: Group) => group.number.toString() === groupNumber
+                        (group: Group) => group.number == groupNumber
                     );
                     if (foundGroup) {
                         return {group: foundGroup, folder: currentFolder};
@@ -243,8 +314,14 @@ export const useNavigationStore = defineStore('navigation', {
                 return null;
             }
 
-            return searchFolders(folderData);
+            for (const folder of folderData.folders) {
+                const found = searchFolders(folder);
+                if (found) {
+                    return found;
+                }
+            }
+            return null;
         },
 
-    }
+    },
 });

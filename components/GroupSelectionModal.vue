@@ -5,27 +5,31 @@ import {type Contexts} from "~/types/interfaces";
 import {useNavigationStore} from "~/stores/useNavigationStore";
 
 const navStore = useNavigationStore();
-const store = useDeviceStore();
+const device = useDeviceStore();
 const settings = useAppSettingsStore();
 
 function setNavigationForGroupSelection() {
-  store.setCurrentAction('selectGroup'); // Setzt die aktuelle Aktion auf "selectGroup"
+  device.setCurrentAction('selectGroup'); // Setzt die aktuelle Aktion auf "selectGroup"
 
   const contextMenu: Contexts = {left: 'Auswahl', middle: 'Status', right: 'Abbruch'};
-  store.setContexts(contextMenu);
+  device.setContexts(contextMenu);
 }
 
 // Bei Mount wird die aktuelle Aktion gesetzt
 onMounted(() => {
-  console.log('Mount GroupSelectionModal');
-  navStore.initialize(store.group); // Initialisiere die Gruppe, wenn die Komponente geladen ist
+  if (device.group) {
+    navStore.initialize(device.group); // Initialisiere die Gruppe, wenn die Komponente geladen ist
+  } else {
+    navStore.initialize(); // Ansonsten starte auf Root-Level
+  }
 
   setNavigationForGroupSelection();
 
   settings.startModalTimer(() => {
-    console.log('TIMEOUT GroupSelectionModal');
-    store.confirmGroupChange(navStore.currentGroup);
-    store.closeCurrentModal();
+    if (navStore.currentGroup && navStore.currentFolder) {
+      device.confirmGroupChange(navStore.currentGroup, navStore.currentFolder);
+    }
+    device.closeCurrentModal();
   });
 });
 
@@ -34,8 +38,8 @@ onBeforeUnmount(() => {
   settings.stopModalTimer();
 
   // Das Contextmenu auf den Home-Zustand zuruecksetzen
-  store.resetContextmenu();
-  store.setCurrentAction('');
+  device.resetContextmenu();
+  device.setCurrentAction('');
   navStore.numberSearch = '';
 });
 </script>

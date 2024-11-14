@@ -28,9 +28,11 @@ function handleLeftButtonClick(event: Event) {
   // handle group selection
   else if (store.currentAction === 'selectGroup') {
     console.log('Close & confirm group selection')
-    store.confirmGroupChange(navStore.currentGroup);
+
+    store.confirmGroupChange(navStore.currentGroup, navStore.currentFolder);
+
     store.closeCurrentModal();
-    console.info('Stopping modal timer...');
+    console.debug('Stopping modal timer...');
     settings.stopModalTimer();
   }
 }
@@ -72,16 +74,19 @@ function handleRightButtonClick(event: Event) {
 
 <template>
   <div class="px-2 w-full grid grid-cols-3 gap-2 mt-4 text-sm">
-    <button class="h-6 bg-gray-600 rounded-md flex items-center justify-center"
-            @click="handleLeftButtonClick">
+    <button
+        class="h-6 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 rounded-md flex items-center justify-center"
+        @click="handleLeftButtonClick">
       <Icon name="material-symbols:circle-outline"/>
     </button>
-    <button class="h-6 bg-gray-600 rounded-md flex items-center justify-center"
-            @click="handleCenterButtonClick">
+    <button
+        class="h-6 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 rounded-md flex items-center justify-center"
+        @click="handleCenterButtonClick">
       <Icon name="material-symbols:check-box-outline-blank"/>
     </button>
-    <button class="h-6 bg-gray-600 rounded-md flex items-center justify-center"
-            @click="handleRightButtonClick">
+    <button
+        class="h-6 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 rounded-md flex items-center justify-center"
+        @click="handleRightButtonClick">
       <Icon name="material-symbols:circle-outline"/>
     </button>
   </div>

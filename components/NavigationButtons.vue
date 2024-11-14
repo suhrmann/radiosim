@@ -28,13 +28,13 @@ function handleLongRedButtonClick() {
     case '':
       // Boot logic
       if (store.isPoweredOff) {
-        store.isBooting = true;
+        store.powerOn();
         break;
       }
 
       // Power off logic
-      if (!store.isPoweredOff) {
-        store.isPoweredOff = true;
+      if (!store.isPoweredOff && !store.isBooting) {
+        store.powerOff();
         break;
       }
 
@@ -80,27 +80,37 @@ function handleGroupSelection(direction: string) {
 <template>
   <div class="w-full flex justify-evenly items-center">
     <!-- Green Call Button -->
-    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg mr-2"
-            @click="handleGreenButtonClick()">
+    <button
+        class="w-6 h-20 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 text-white rounded-md flex items-center justify-center text-lg mr-2"
+        @click="handleGreenButtonClick()">
       <Icon class="text-green-600" name="material-symbols:call"/>
     </button>
 
     <!-- Circle Menu -->
     <div class="circle-menu">
-      <button class="menu-item item-1 flex items-center justify-center text-white font-bold"
-              @click="handleNavigationButtonClick('up')"><span>▲</span></button>
-      <button class="menu-item item-2 flex items-center justify-center text-white font-bold"
-              @click="handleNavigationButtonClick('right')"><span>▲</span></button>
-      <button class="menu-item item-3 flex items-center justify-center text-white font-bold"
-              @click="handleNavigationButtonClick('down')"><span>▲</span></button>
-      <button class="menu-item item-4 flex items-center justify-center text-white font-bold"
-              @click="handleNavigationButtonClick('left')"><span>▲</span></button>
+      <button
+          class="menu-item item-1 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 flex items-center justify-center text-white font-bold"
+          @click="handleNavigationButtonClick('up')"><span>▲</span></button>
+      <button
+          class="menu-item item-2 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 flex items-center justify-center text-white font-bold"
+          @click="handleNavigationButtonClick('right')"><span>▲</span></button>
+      <button
+          class="menu-item item-3 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 flex items-center justify-center text-white font-bold"
+          @click="handleNavigationButtonClick('down')"><span>▲</span></button>
+      <button
+          class="menu-item item-4 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 flex items-center justify-center text-white font-bold"
+          @click="handleNavigationButtonClick('left')"><span>▲</span></button>
     </div>
 
     <!-- Red Cancel Button -->
-    <button class="w-6 h-20 bg-gray-600 text-white rounded-md flex items-center justify-center text-lg ml-2"
-            v-longpress="handleLongRedButtonClick" @click="handleRedButtonClick()">
-      <Icon class="text-red-600" name="material-symbols:phone-disabled-rounded"/>
+    <button
+        class="w-6 h-20 bg-gray-600 hover:bg-gray-700 active:ring-2 active:ring-inset active:ring-gray-600 text-white rounded-md flex items-center justify-center text-lg ml-2"
+        v-use-longpress @longpress="handleLongRedButtonClick" @click="handleRedButtonClick()">
+      <div class="flex flex-col h-full py-1 justify-between items-center">
+        <Icon size="0.7rem" class="text-white" name="material-symbols:other-houses"/>
+        <Icon class="text-red-600" name="material-symbols:phone-disabled-rounded"/>
+        <Icon size="0.7rem" class="text-white" name="material-symbols:power-settings-new"/>
+      </div>
     </button>
   </div>
 </template>
@@ -118,7 +128,6 @@ function handleGroupSelection(direction: string) {
   position: absolute;
   width: 2.3rem;
   height: 2.3rem;
-  background-color: #4b5563; /* Tailwind Blue-400 */
   display: flex;
   align-items: center;
   justify-content: center;

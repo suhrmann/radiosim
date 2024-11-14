@@ -1,10 +1,10 @@
-import {defineStore} from 'pinia';
-
+// /stores/useAppSettingsStore.ts
 export const useAppSettingsStore = defineStore('settings', {
     state: () => ({
         modalTimer: null as NodeJS.Timeout | null,
-        modalPostAction: null as Function | null,
+        modalPostAction: {} as Function,
         modalTimeout: 5, // Standard Timeout von 5 Sekunden
+        debug: false,
     }),
     actions: {
         setModalTimeout(timeout: number) {
@@ -13,25 +13,25 @@ export const useAppSettingsStore = defineStore('settings', {
         startModalTimer(postAction: Function) {
             this.modalPostAction = postAction;
 
-            if (this.timer) {
-                clearTimeout(this.timer);
+            if (this.modalTimer) {
+                clearTimeout(this.modalTimer);
             }
 
-            this.timer = setTimeout(() => {
+            this.modalTimer = setTimeout(() => {
                 console.info("Running postAction for modal...");
                 postAction();
             }, this.modalTimeout * 1000); // 5 Sekunden Timer
         },
         resetModalTimer() {
-            if (this.timer != null) {
+            if (this.modalTimer != null) {
                 this.startModalTimer(this.modalPostAction); // Setzt den Timer zurück und startet ihn neu
             }
         },
         stopModalTimer() {
-            if (this.timer) {
+            if (this.modalTimer) {
                 console.info('clearing timer...');
-                clearTimeout(this.timer);
-                this.timer = null;
+                clearTimeout(this.modalTimer);
+                this.modalTimer = null;
             }
         },
     },

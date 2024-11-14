@@ -1,5 +1,3 @@
-import {defineStore} from 'pinia';
-
 export const useSoundStore = defineStore('sound', {
     state: () => ({
         isSoundPlaying: false,
