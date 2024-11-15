@@ -3,11 +3,12 @@
 
 <template>
 
-  <div class="flex flex-col lg:flex-row flex-1 items-center space-x-16 justify-center bg-gray-200">
+  <div
+      class="flex flex-col lg:flex-row flex-1 items-center lg:space-x-16 justify-center bg-gray-200">
     <!-- Funkgeraet -->
     <RadioDevice/>
 
-    <div class="space-y-4 max-w-screen-sm">
+    <div class="space-y-4 mb-4 max-w-xs lg:max-w-screen-sm">
       <!-- Welcome Message -->
       <div class="p-4 bg-white border border-gray-300 rounded-md shadow-md">
         <h1 class="text-2xl font-bold mb-2">Willkommen bei Funk<span class="text-blue-800">Sim</span></h1>
