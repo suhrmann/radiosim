@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import {useDeviceStore} from '@/stores/useDeviceStore';
-import {useNavigationStore} from '@/stores/useNavigationStore';
+import {useDeviceStore} from '~/stores/useDeviceStore';
+import {useNavigationStore} from '~/stores/useNavigationStore';
 
 const navStore = useNavigationStore();
 const store = useDeviceStore();

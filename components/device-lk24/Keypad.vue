@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {useDeviceStore} from '@/stores/useDeviceStore';
+import {useDeviceStore} from '~/stores/useDeviceStore';
 import {useNavigationStore} from "~/stores/useNavigationStore";
 
 const store = useDeviceStore();

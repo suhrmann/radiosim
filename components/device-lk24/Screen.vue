@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useDeviceStore} from '@/stores/useDeviceStore';
+import {useDeviceStore} from '~/stores/useDeviceStore';
 import CheckmarkModal from "~/components/CheckmarkModal.vue";
 import BootScreen from "~/components/BootScreen.vue";
 

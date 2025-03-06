@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {useDeviceStore} from '@/stores/useDeviceStore';
+import {useDeviceStore} from '~/stores/useDeviceStore';
 import {useNavigationStore} from "~/stores/useNavigationStore";
 import {useAppSettingsStore} from "~/stores/useAppSettingsStore";
 
