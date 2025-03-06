@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import {useDeviceStore} from '@/stores/useDeviceStore';
+
+const store = useDeviceStore();
+
 let isOpen = ref(false)
 
 function changeRadioDevice(deviceId: string) {
-  isOpen.value = false
+  isOpen.value = false;  // close dropdown
 
-  console.log("New Device: ", deviceId)
+  store.changeDevice(deviceId);  // change radio device
 }
 </script>
 

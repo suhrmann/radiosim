@@ -7,6 +7,8 @@ import {useSound} from "~/composables/useSound";
 
 export const useDeviceStore = defineStore('device', {
     state: () => ({
+        deviceId: 'default',
+
         isPoweredOff: true,
         isBooting: false,
         led1Color: '',
@@ -31,6 +33,9 @@ export const useDeviceStore = defineStore('device', {
         hasSDS: false,
     }),
     actions: {
+        changeDevice(deviceId: string) {
+            this.deviceId = deviceId;
+        },
         updateDateTime() {
             this.time = dayjs().format('HH:mm');
             this.date = dayjs().format('DD.MM.YYYY');
