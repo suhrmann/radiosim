@@ -34,6 +34,7 @@ function changeRadioDevice(deviceId: string) {
               <div class="py-1" role="none">
                 <!-- Active: "bg-gray-100 text-gray-900 outline-hidden", Not Active: "text-gray-700" -->
                 <NuxtLink @click="changeRadioDevice('lk24')" to="/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1">LK24 (default)</NuxtLink>
+                <NuxtLink @click="changeRadioDevice('sepura')" to="/" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="menu-item-1">Sepura (nPol)</NuxtLink>
               </div>
             </div>
           </div>
